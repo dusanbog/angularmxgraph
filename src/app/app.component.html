@@ -1,3 +1,2 @@
-<div id="demoGraph">
-  <div #graphContainer></div>
+<div *ngIf="!loading" class="mxgraph" style="max-width:100%;border:1px solid transparent;" [attr.data-mxgraph]="toJson(options)">
 </div>

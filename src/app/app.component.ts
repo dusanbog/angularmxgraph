@@ -1,10 +1,7 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
+import { escape as _escape } from 'lodash-es';
 
-declare var mxGraph: any;
-declare var mxUtils: any;
-declare var mxCodec: any;
-declare var mxEvent: any;
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -12,64 +9,58 @@ declare var mxEvent: any;
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild('graphContainer') containerElementRef: ElementRef;
+  options={    
+    highlight:"#0000ff",
+    lightbox:false,
+    nav:true,
+    resize:true,
+    editable:false,
+    toolbar:"zoom layers",
+    zoom:1,
+    xml:"",
+  };
+  loading=true;
   constructor(private http:HttpClient) {
-   
+    this.loadScripts();
+    
   }
-  xml="";
+
   get container() {
     return this.containerElementRef.nativeElement;
   }
-
+  loadScripts() {
+    const dynamicScripts = [
+     'https://viewer.diagrams.net/js/viewer-static.min.js'
+    ];
+    for (let i = 0; i < dynamicScripts.length; i++) {
+      const node = document.createElement('script');
+      node.src = dynamicScripts[i];
+      node.type = 'text/javascript';
+      node.async = false;
+      node.charset = 'utf-8';
+      document.getElementsByTagName('head')[0].appendChild(node);
+    }
+  }
   loadXML()
   {
     /*Read Data*/
     this.http.get('assets/diagram.xml', { responseType: 'text' })  
     .subscribe((data) => {        
-      this.xml = data;
-      // Disables the built-in context menu
-      //mxEvent.disableContextMenu(this.container);
-      // Creates the graph inside the given container
-
-      var diagram = mxUtils.parseXml(this.xml);
-      var codec = new mxCodec(diagram);      
-      const graph = new mxGraph(this.container);
-      graph.htmlLabels = true;
-      //graph.cellsEditable = false;
-
-      graph.setConnectable(true);
-      graph.setCellsEditable(false);
-      //mxGraphHandler.prototype.guidesEnabled = true;
-      graph.setEnabled(true);
-      mxEvent.disableContextMenu(this.container);
-      graph.setEnabled(false);
-      graph.setCellsResizable(false);
-      graph.setResizeContainer(false);
-      graph.setMultigraph(false);
-      //graph.zoomIn();
-      graph.zoomOut();
-      //graph.zoomActual();
-      //graph.centerZoom = true;
-      graph.allowAutoPanning = false
-      graph.setPanning(false);
-
-
-      graph.model.beginUpdate();
-      codec.decode(diagram.documentElement, graph.getModel());     
-      graph.model.endUpdate(); 
-      // render as HTML node always. You probably won't want that in real world though
-      graph.convertValueToString = function(cell:any) {
-        return cell.value;
-      }
-           
-      graph.refresh();
+      this.options.xml = data;
+      this.loading=false;
     });  
     /*Read Data*/
   }
   ngAfterViewInit(): void {
-
-       
+    
     this.loadXML();
+    //document.getElementById("top-page").scrollTo({ behavior: "smooth", top: 0 });
+
+    
    
   }
-
+  toJson(a:any){
+    const ret = JSON.stringify(a);
+    return ret;
+  }
 }
