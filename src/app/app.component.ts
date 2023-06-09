@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import { escape as _escape } from 'lodash-es';
 
@@ -8,7 +8,6 @@ import { escape as _escape } from 'lodash-es';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
-  @ViewChild('graphContainer') containerElementRef: ElementRef;
   options={    
     highlight:"#0000ff",
     lightbox:false,
@@ -20,14 +19,11 @@ export class AppComponent implements AfterViewInit {
     xml:"",
   };
   loading=true;
-  constructor(private http:HttpClient) {
+  constructor(private http:HttpClient,private readonly changeDetectorRef: ChangeDetectorRef) {
     this.loadScripts();
-    
+    this.loadXML();
   }
 
-  get container() {
-    return this.containerElementRef.nativeElement;
-  }
   loadScripts() {
     const dynamicScripts = [
      'https://viewer.diagrams.net/js/viewer-static.min.js'
@@ -48,19 +44,22 @@ export class AppComponent implements AfterViewInit {
     .subscribe((data) => {        
       this.options.xml = data;
       this.loading=false;
+
     });  
     /*Read Data*/
   }
-  ngAfterViewInit(): void {
-    
-    this.loadXML();
-    //document.getElementById("top-page").scrollTo({ behavior: "smooth", top: 0 });
-
-    
-   
+  ngAfterViewInit(): void {        
+    setTimeout(() => {
+      this.findMe();
+    }, 500);    
   }
   toJson(a:any){
     const ret = JSON.stringify(a);
     return ret;
+  }
+  findMe(){
+    var elements = document.querySelectorAll('[href="http://localhost:4200/routeCode=10"]');
+    debugger;
+    elements[0]?.scrollIntoView();
   }
 }
