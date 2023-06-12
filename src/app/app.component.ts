@@ -1,4 +1,12 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  ChangeDetectorRef,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import { escape as _escape } from 'lodash-es';
 
@@ -7,26 +15,30 @@ import { escape as _escape } from 'lodash-es';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit {
-  options={    
-    highlight:"#0000ff",
-    lightbox:false,
-    nav:true,
-    resize:true,
-    editable:false,
-    toolbar:"zoom layers",
-    zoom:1,
-    xml:"",
+export class AppComponent implements OnInit,AfterViewInit {
+  options = {
+    highlight: '#0000ff',
+    lightbox: false,
+    nav: true,
+    resize: true,
+    editable: false,
+    toolbar: 'zoom layers',
+    zoom: 1,
+    xml: '',
   };
-  loading=true;
-  constructor(private http:HttpClient,private readonly changeDetectorRef: ChangeDetectorRef) {
-    this.loadScripts();
+  loading = true;
+  constructor(
+    private http: HttpClient,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
+    this.loadScripts();    
+  }
+  ngOnInit(): void {
     this.loadXML();
   }
-
   loadScripts() {
     const dynamicScripts = [
-     'https://viewer.diagrams.net/js/viewer-static.min.js'
+      'https://viewer.diagrams.net/js/viewer-static.min.js',
     ];
     for (let i = 0; i < dynamicScripts.length; i++) {
       const node = document.createElement('script');
@@ -37,29 +49,30 @@ export class AppComponent implements AfterViewInit {
       document.getElementsByTagName('head')[0].appendChild(node);
     }
   }
-  loadXML()
-  {
+  loadXML() {
     /*Read Data*/
-    this.http.get('assets/diagram.xml', { responseType: 'text' })  
-    .subscribe((data) => {        
-      this.options.xml = data;
-      this.loading=false;
-
-    });  
+    this.http
+      .get('assets/diagram.xml', { responseType: 'text' })
+      .subscribe((data) => {
+        this.options.xml = data;
+        this.loading = false;
+      });
     /*Read Data*/
   }
-  ngAfterViewInit(): void {        
-    setTimeout(() => {
-      this.findMe();
-    }, 500);    
+  ngAfterViewInit(): void {
+    // setTimeout(() => {
+    //   this.findMe();
+    // }, 500);
   }
-  toJson(a:any){
+  toJson(a: any) {    
     const ret = JSON.stringify(a);
+    console.log(ret);
     return ret;
   }
-  findMe(){
-    var elements = document.querySelectorAll('[href="http://localhost:4200/routeCode=10"]');
-    debugger;
+  findMe() {
+    var elements = document.querySelectorAll(
+      '[href="http://localhost:4200/routeCode=58"]'
+    );
     elements[0]?.scrollIntoView();
   }
 }
