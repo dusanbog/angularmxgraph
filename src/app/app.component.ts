@@ -60,19 +60,19 @@ export class AppComponent implements OnInit,AfterViewInit {
     /*Read Data*/
   }
   ngAfterViewInit(): void {
-    // setTimeout(() => {
-    //   this.findMe();
-    // }, 500);
+    setTimeout(() => {
+      this.findMe('58');
+    }, 500);
   }
   toJson(a: any) {    
     const ret = JSON.stringify(a);
     console.log(ret);
     return ret;
   }
-  findMe() {
+  findMe(routeCode:string) {
     var elements = document.querySelectorAll(
-      '[href="http://localhost:4200/routeCode=58"]'
+      `[href$="routeCode=${routeCode}"]`
     );
-    elements[0]?.scrollIntoView();
+    elements[0]?.scrollIntoView({ behavior: "smooth", block: "center"});
   }
 }
